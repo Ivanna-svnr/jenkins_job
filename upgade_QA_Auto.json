@@ -1,0 +1,2102 @@
+{
+	"info": {
+		"_postman_id": "139dacde-4cc5-400c-b2f0-389d547af3d9",
+		"name": "upgade_QA_Auto_external_file",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "15234593"
+	},
+	"item": [
+		{
+			"name": "negative_tests",
+			"item": [
+				{
+					"name": "prod_env_profile_validation",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Incorrect data: \" + jsonData.message, function () {  ",
+									"   pm.expect(jsonData.status).to.not.eql(\"ok\");",
+									"   pm.expect(jsonData.message).to.exist; ",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"name\": \"{{name}}\",\n  \"lastName\": \"{{lastName}}\",\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\",\n  \"repeatPassword\": \"{{repeatPassword}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{prod_env}}auth/signup",
+							"host": [
+								"{{prod_env}}auth"
+							],
+							"path": [
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "dev_env_profile_validation",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Incorrect data: \" + jsonData.message, function () {  ",
+									"   pm.expect(jsonData.status).to.not.eql(\"ok\");",
+									"   pm.expect(jsonData.message).to.exist; ",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"name\": \"{{name}}\",\n  \"lastName\": \"{{lastName}}\",\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\",\n  \"repeatPassword\": \"{{repeatPassword}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{dev_env}}auth/signup",
+							"host": [
+								"{{dev_env}}auth"
+							],
+							"path": [
+								"signup"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "prod_env",
+			"item": [
+				{
+					"name": "create_user",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var randomFirstName = pm.variables.replaceIn(\"{{$randomFirstName}}\");",
+									"var randomLastName = pm.variables.replaceIn(\"{{$randomLastName}}\");",
+									"var randomEmail = pm.variables.replaceIn(\"{{$randomEmail}}\");",
+									"",
+									"",
+									"pm.collectionVariables.set('user_name', randomFirstName);",
+									"pm.collectionVariables.set('user_lastName', randomLastName);",
+									"pm.collectionVariables.set('user_email', randomEmail);",
+									"pm.collectionVariables.set('user_password', JSON.parse(pm.request.body.raw).password);",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var schema = {",
+									"\"type\": \"object\",",
+									"  \"properties\": {",
+									"    \"status\": {",
+									"      \"type\": \"string\"",
+									"    },",
+									"    \"data\": {",
+									"      \"type\": \"object\",",
+									"      \"properties\": {",
+									"        \"userId\": {",
+									"          \"type\": \"integer\"",
+									"        },",
+									"        \"photoFilename\": {",
+									"          \"type\": \"string\"",
+									"        },",
+									"        \"distanceUnits\": {",
+									"          \"type\": \"string\"",
+									"        },",
+									"        \"currency\": {",
+									"          \"type\": \"string\"",
+									"        }",
+									"      },",
+									"      \"required\": [",
+									"        \"userId\",",
+									"        \"photoFilename\",",
+									"        \"distanceUnits\",",
+									"        \"currency\"",
+									"      ]",
+									"    }",
+									"  },",
+									"  \"required\": [",
+									"    \"status\",",
+									"    \"data\"",
+									"  ]",
+									"}",
+									"pm.test('Schema is valid', function () {",
+									"    pm.expect(tv4.validate(pm.response.json(), schema)).to.be.true;",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"var userId = jsonData.data.userId;",
+									"pm.collectionVariables.set('userId', userId);",
+									"",
+									"pm.test(\"Data type of status is string\", function () {",
+									"    pm.expect(pm.response.json().status).to.be.string;",
+									"});",
+									"pm.test(\"Data type of userId is number\", function () {",
+									"    pm.expect(pm.response.json().data.userId).to.be.a('number');",
+									"});",
+									"pm.test(\"Data type of photo Filename is string\", function () {",
+									"    pm.expect(pm.response.json().data.photoFilename).to.be.string;",
+									"});",
+									"pm.test(\"Data type of distance units is string\", function () {",
+									"    pm.expect(pm.response.json().data.distanceUnits).to.be.string;",
+									"});",
+									"pm.test(\"Data type of currency is string\", function () {",
+									"    pm.expect(pm.response.json().data.currency).to.be.string;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"{{user_name}}\",\n  \"lastName\": \"{{user_lastName}}\",\n  \"email\": \"{{user_email}}\",\n  \"password\": \"HYst65*JHao\",\n  \"repeatPassword\": \"HYst65*JHao\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{prod_env}}auth/signup",
+							"host": [
+								"{{prod_env}}auth"
+							],
+							"path": [
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "signin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"const result = jsonData.status === \"ok\";",
+									"",
+									"pm.test(\"expect().to.be.true\", function () {   ",
+									"    pm.expect(result).to.be.true",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"{{user_email}}\",\n  \"password\": \"{{user_password}}\",\n  \"remember\": false\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{prod_env}}auth/signin",
+							"host": [
+								"{{prod_env}}auth"
+							],
+							"path": [
+								"signin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "edit_profile",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"correct name\", function () {",
+									"    var name = pm.response.json().name;",
+									"    pm.expect(name).to.match(/^[a-zA-Z]{2,20}$/);",
+									"});",
+									"",
+									"pm.test(\"correct lastName\", function () {",
+									"    var lastName = pm.response.json().lastName;",
+									"    pm.expect(lastName).to.match(/^[a-zA-Z]{2,20}$/);",
+									"});",
+									"",
+									"pm.test(\"Check birth date\"), function () {",
+									"    var dateBirth = pm.resonse.json().dateBirth;",
+									"    pm.expect(dateBirth).to.match(/^\\d{4}-\\d{2}-\\d{2}$/);",
+									"};"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const editFirstName = pm.variables.replaceIn(\"{{$randomFirstName}}\");",
+									"const editLastName = pm.variables.replaceIn(\"{{$randomLastName}}\");",
+									"",
+									"pm.collectionVariables.set('user_name', editFirstName);",
+									"",
+									"pm.collectionVariables.set('user_lastName', editLastName);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"photo\": \"{{$randomAvatarImage}}\",\n  \"name\": \"{{user_name}}\",\n  \"lastName\": \"{{user_lastName}}\",\n  \"dateBirth\": \"2006-12-09\",\n  \"country\": \"{{$randomCountry}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{prod_env}}users/profile",
+							"host": [
+								"{{prod_env}}users"
+							],
+							"path": [
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "edit_settings",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"User's currency is supported\", function () {",
+									"    var supportedCurrencies = [\"usd\", \"eur\", \"gbt\", \"pln\", \"uah\"];",
+									"    var currency = pm.response.json().data.currency;",
+									"    pm.expect(supportedCurrencies).to.contain(currency);",
+									"});",
+									"pm.test(\"User's distance unit is supported\", function () {",
+									"    var supportedDistanceUnits = [\"km\", \"ml\"];",
+									"    var distanceUnits = pm.response.json().data.distanceUnits;",
+									"    pm.expect(supportedDistanceUnits).to.contain(distanceUnits);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"currency\": \"eur\",\n  \"distanceUnits\": \"ml\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{prod_env}}users/settings",
+							"host": [
+								"{{prod_env}}users"
+							],
+							"path": [
+								"settings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "edit_email",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var email = pm.request.body.raw; ",
+									"var emailRegex = /.+@.+\\..+/;",
+									"",
+									"pm.test(\"Mail format is correct\", function () {",
+									"    pm.expect(email).to.match(emailRegex);",
+									"});",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const editEmail = pm.variables.replaceIn(\"{{$randomEmail}}\")",
+									"pm.collectionVariables.set('user_email', editEmail);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"{{user_email}}\",\n  \"password\": \"{{user_password}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{prod_env}}users/email",
+							"host": [
+								"{{prod_env}}users"
+							],
+							"path": [
+								"email"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "edit_password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set(\"user_password\", JSON.parse(pm.request.body.raw).password);",
+									"",
+									"var savedUserId = pm.collectionVariables.get(\"userId\");",
+									"var jsonData = pm.response.json();",
+									"var responseUserId = jsonData.data.userId;",
+									"",
+									"pm.test(\"userId is the same after password change\", function () {",
+									"    pm.expect(responseUserId).to.eql(savedUserId);",
+									"});",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"oldPassword\": \"{{user_password}}\",\n  \"password\": \"jsh^gF34pj788u\",\n  \"repeatPassword\": \"jsh^gF34pj788u\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{prod_env}}users/password",
+							"host": [
+								"{{prod_env}}users"
+							],
+							"path": [
+								"password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Body matches string\", function () {",
+									"    pm.expect(pm.response.text()).to.include(\"ok\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{prod_env}}auth/logout",
+							"host": [
+								"{{prod_env}}auth"
+							],
+							"path": [
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "signin_again",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set(\"user_password\", JSON.parse(pm.request.body.raw).password);",
+									"",
+									"var savedUserId = pm.collectionVariables.get(\"userId\");",
+									"var jsonData = pm.response.json();",
+									"var responseUserId = jsonData.data.userId;",
+									"",
+									"pm.test(\"userId is the same when signing in after logout\", function () {",
+									"    pm.expect(responseUserId).to.eql(savedUserId);",
+									"});",
+									"",
+									"pm.test(\"has keys data and status\", function () {   ",
+									"    pm.expect(jsonData).to.have.keys('status','data');",
+									"});",
+									"pm.test(\"status is ok\", function () {   ",
+									"    pm.expect(jsonData).to.have.property('status','ok')",
+									"});",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"{{user_email}}\",\n  \"password\": \"{{user_password}}\",\n  \"remember\": false\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{prod_env}}auth/signin",
+							"host": [
+								"{{prod_env}}auth"
+							],
+							"path": [
+								"signin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "car_brands",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Includes required fields\", function () {",
+									"    var data = pm.response.json().data;",
+									"",
+									"      data.forEach(function(key) {",
+									"        pm.expect(key).to.have.property(\"id\");",
+									"        pm.expect(key).to.have.property(\"title\");",
+									"        pm.expect(key).to.have.property(\"logoFilename\");",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Content-Type is present\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{prod_env}}cars/brands",
+							"host": [
+								"{{prod_env}}cars"
+							],
+							"path": [
+								"brands"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "car_models",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									" var jsonData = pm.response.json().data;",
+									"",
+									"pm.test(\"The response is not empty\", function () {",
+									"    pm.expect(jsonData).to.not.be.empty; ",
+									"});",
+									"",
+									"pm.test(\"Includes required fields\", function () {",
+									"      jsonData.forEach(function(key) {",
+									"        pm.expect(key).to.have.property(\"id\");",
+									"        pm.expect(key).to.have.property(\"carBrandId\");",
+									"        pm.expect(key).to.have.property(\"title\");",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{prod_env}}cars/models",
+							"host": [
+								"{{prod_env}}cars"
+							],
+							"path": [
+								"models"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add_car",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"pm.collectionVariables.set(\"car_id\", jsonData.data.id);",
+									"pm.collectionVariables.set(\"mileage\", jsonData.data.initialMileage);",
+									"",
+									"",
+									"var status = jsonData.status === \"ok\";",
+									"pm.test(\"Status is ok\", function () {   ",
+									"    pm.expect(status).to.be.true",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"carBrandId\": 2,\n  \"carModelId\": 8,\n  \"mileage\": 120\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{prod_env}}cars",
+							"host": [
+								"{{prod_env}}cars"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "users_cars",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Body matches string\", function () {",
+									"    pm.expect(pm.response.text()).to.include(\"data\");",
+									"});",
+									"pm.test(\"Content-Type is present\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{prod_env}}cars",
+							"host": [
+								"{{prod_env}}cars"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "current_car_by_id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"var savedCarId = pm.collectionVariables.get(\"car_id\");",
+									"var responseCarId = jsonData.data.id;",
+									"var savedMileage = pm.collectionVariables.get(\"mileage\");",
+									"var responseMileage = jsonData.data.initialMileage;",
+									"",
+									"pm.test(\"Car id and mileage are the same\", function () {",
+									"    pm.expect(responseCarId).to.eql(savedCarId);",
+									"    pm.expect(responseMileage).to.eql(savedMileage);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{prod_env}}cars/{{car_id}}",
+							"host": [
+								"{{prod_env}}cars"
+							],
+							"path": [
+								"{{car_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "edid_car",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var previousMileage = pm.collectionVariables.get(\"mileage\");",
+									"var newMileage = parseInt(previousMileage) + Math.floor(Math.random() * 100) + 1;",
+									"",
+									"pm.collectionVariables.set(\"mileage\", newMileage);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"'initialMileage' is less than edited 'mileage'\", function () {",
+									"    var jsonData = pm.response.json().data;",
+									"    pm.expect(jsonData.initialMileage).to.be.lt(jsonData.mileage);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"carBrandId\": 4,\n  \"carModelId\": 8,\n  \"mileage\": {{mileage}}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{prod_env}}cars/{{car_id}}",
+							"host": [
+								"{{prod_env}}cars"
+							],
+							"path": [
+								"{{car_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create_expenses",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"",
+									"var jsonData = pm.response.json();",
+									"pm.collectionVariables.set(\"expense_id\", jsonData.data.id);",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var moment = require('moment');",
+									"pm.collectionVariables.set('currentDate', moment().format((\"YYYY-MM-DD\")));",
+									"",
+									"var currentLiters = pm.variables.replaceIn(Math.floor(Math.random() * 100) + 1);",
+									"pm.collectionVariables.set(\"currentLiters\", currentLiters);",
+									"",
+									"var currentTotalCost = pm.variables.replaceIn(Math.floor(Math.random() * 100) + 1);",
+									"pm.collectionVariables.set(\"currentTotalCost\", currentTotalCost);",
+									"",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"carId\": \"{{car_id}}\",\n  \"reportedAt\": \"{{currentDate}}\",\n  \"mileage\": {{mileage}},\n  \"liters\": {{currentLiters}},\n  \"totalCost\": 50,\n  \"forceMileage\": false\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{prod_env}}expenses",
+							"host": [
+								"{{prod_env}}expenses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "edid_expences",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var previousMileage = pm.collectionVariables.get(\"mileage\");",
+									"var newMileage = parseInt(previousMileage) + Math.floor(Math.random() * 100) + 1;",
+									"pm.collectionVariables.set(\"mileage\", newMileage);",
+									"var currentLiters = pm.variables.replaceIn(Math.floor(Math.random() * 100) + 1);",
+									"pm.collectionVariables.set(\"newLiters\", currentLiters);",
+									"",
+									"var currentTotalCost = pm.variables.replaceIn(Math.floor(Math.random() * 100) + 1);",
+									"pm.collectionVariables.set(\"newTotalCost\", currentTotalCost);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var currentLiters = parseFloat(pm.variables.get(\"currentLiters\"));",
+									"var newLiters = parseFloat(pm.response.json().data.liters); ",
+									"pm.test(\"Check if current and new liters exist\", function () {",
+									"    pm.expect(currentLiters).to.exist; ",
+									"    pm.expect(newLiters).to.exist;",
+									"});",
+									"pm.test(\"Check if new liters amount is greater than previous liters amount\", function () {",
+									"    pm.expect(newLiters).to.be.at.least(currentLiters); ",
+									"});",
+									"",
+									"var currentTotalCost = parseFloat(pm.variables.get(\"currentTotalCost\"));",
+									"var newTotalCost = parseFloat(pm.response.json().data.totalCost); ",
+									"pm.test(\"Check if current and new total cost exist\", function () {",
+									"    pm.expect(currentTotalCost).to.exist; ",
+									"    pm.expect(newTotalCost).to.exist;",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"carId\": \"{{car_id}}\",\n  \"reportedAt\": \"{{currentDate}}\",\n  \"mileage\": {{mileage}},\n  \"liters\": {{currentLiters}},\n  \"totalCost\": 50,\n  \"forceMileage\": false\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{prod_env}}expenses/{{expense_id}}",
+							"host": [
+								"{{prod_env}}expenses"
+							],
+							"path": [
+								"{{expense_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete_car",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.unset(\"car_id\");",
+									"pm.collectionVariables.unset(\"currentDate\");",
+									"pm.collectionVariables.unset(\"expense_id\");",
+									"pm.collectionVariables.unset(\"mileage\");",
+									"pm.collectionVariables.unset(\"currentLiters\");",
+									"pm.collectionVariables.unset(\"currentTotalCost\");",
+									"pm.collectionVariables.unset(\"newLiters\");",
+									"pm.collectionVariables.unset(\"newTotalCost\");",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{prod_env}}cars/{{car_id}}",
+							"host": [
+								"{{prod_env}}cars"
+							],
+							"path": [
+								"{{car_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete_user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.unset(\"user_email\");",
+									"pm.collectionVariables.unset(\"user_lastName\");",
+									"pm.collectionVariables.unset(\"user_name\");",
+									"pm.collectionVariables.unset(\"user_password\");",
+									"pm.collectionVariables.unset(\"userId\");",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{prod_env}}users",
+							"host": [
+								"{{prod_env}}users"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "dev_env",
+			"item": [
+				{
+					"name": "create_user",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var randomFirstName = pm.variables.replaceIn(\"{{$randomFirstName}}\");",
+									"var randomLastName = pm.variables.replaceIn(\"{{$randomLastName}}\");",
+									"var randomEmail = pm.variables.replaceIn(\"{{$randomEmail}}\");",
+									"",
+									"",
+									"pm.collectionVariables.set('user_name', randomFirstName);",
+									"pm.collectionVariables.set('user_lastName', randomLastName);",
+									"pm.collectionVariables.set('user_email', randomEmail);",
+									"pm.collectionVariables.set('user_password', JSON.parse(pm.request.body.raw).password);",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var schema = {",
+									"\"type\": \"object\",",
+									"  \"properties\": {",
+									"    \"status\": {",
+									"      \"type\": \"string\"",
+									"    },",
+									"    \"data\": {",
+									"      \"type\": \"object\",",
+									"      \"properties\": {",
+									"        \"userId\": {",
+									"          \"type\": \"integer\"",
+									"        },",
+									"        \"photoFilename\": {",
+									"          \"type\": \"string\"",
+									"        },",
+									"        \"distanceUnits\": {",
+									"          \"type\": \"string\"",
+									"        },",
+									"        \"currency\": {",
+									"          \"type\": \"string\"",
+									"        }",
+									"      },",
+									"      \"required\": [",
+									"        \"userId\",",
+									"        \"photoFilename\",",
+									"        \"distanceUnits\",",
+									"        \"currency\"",
+									"      ]",
+									"    }",
+									"  },",
+									"  \"required\": [",
+									"    \"status\",",
+									"    \"data\"",
+									"  ]",
+									"}",
+									"pm.test('Schema is valid', function () {",
+									"    pm.expect(tv4.validate(pm.response.json(), schema)).to.be.true;",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"var userId = jsonData.data.userId;",
+									"pm.collectionVariables.set('userId', userId);",
+									"",
+									"pm.test(\"Data type of status is string\", function () {",
+									"    pm.expect(pm.response.json().status).to.be.string;",
+									"});",
+									"pm.test(\"Data type of userId is number\", function () {",
+									"    pm.expect(pm.response.json().data.userId).to.be.a('number');",
+									"});",
+									"pm.test(\"Data type of photo Filename is string\", function () {",
+									"    pm.expect(pm.response.json().data.photoFilename).to.be.string;",
+									"});",
+									"pm.test(\"Data type of distance units is string\", function () {",
+									"    pm.expect(pm.response.json().data.distanceUnits).to.be.string;",
+									"});",
+									"pm.test(\"Data type of currency is string\", function () {",
+									"    pm.expect(pm.response.json().data.currency).to.be.string;",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"{{user_name}}\",\n  \"lastName\": \"{{user_lastName}}\",\n  \"email\": \"{{user_email}}\",\n  \"password\": \"HYst65*JHao\",\n  \"repeatPassword\": \"HYst65*JHao\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{dev_env}}auth/signup",
+							"host": [
+								"{{dev_env}}auth"
+							],
+							"path": [
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "signin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"const result = jsonData.status === \"ok\";",
+									"",
+									"pm.test(\"expect().to.be.true\", function () {   ",
+									"    pm.expect(result).to.be.true",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"{{user_email}}\",\n  \"password\": \"{{user_password}}\",\n  \"remember\": false\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{dev_env}}auth/signin",
+							"host": [
+								"{{dev_env}}auth"
+							],
+							"path": [
+								"signin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "edit_profile",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"correct name\", function () {",
+									"    var name = pm.response.json().name;",
+									"    pm.expect(name).to.match(/^[a-zA-Z]{2,20}$/);",
+									"});",
+									"",
+									"pm.test(\"correct lastName\", function () {",
+									"    var lastName = pm.response.json().lastName;",
+									"    pm.expect(lastName).to.match(/^[a-zA-Z]{2,20}$/);",
+									"});",
+									"",
+									"pm.test(\"Check birth date\"), function () {",
+									"    var dateBirth = pm.resonse.json().dateBirth;",
+									"    pm.expect(dateBirth).to.match(/^\\d{4}-\\d{2}-\\d{2}$/);",
+									"};"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const editFirstName = pm.variables.replaceIn(\"{{$randomFirstName}}\");",
+									"const editLastName = pm.variables.replaceIn(\"{{$randomLastName}}\");",
+									"",
+									"pm.collectionVariables.set('user_name', editFirstName);",
+									"",
+									"pm.collectionVariables.set('user_lastName', editLastName);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"photo\": \"{{$randomAvatarImage}}\",\n  \"name\": \"{{user_name}}\",\n  \"lastName\": \"{{user_lastName}}\",\n  \"dateBirth\": \"2006-12-09\",\n  \"country\": \"{{$randomCountry}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{dev_env}}users/profile",
+							"host": [
+								"{{dev_env}}users"
+							],
+							"path": [
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "edit_settings",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"User's currency is supported\", function () {",
+									"    var supportedCurrencies = [\"usd\", \"eur\", \"gbt\", \"pln\", \"uah\"];",
+									"    var currency = pm.response.json().data.currency;",
+									"    pm.expect(supportedCurrencies).to.contain(currency);",
+									"});",
+									"pm.test(\"User's distance unit is supported\", function () {",
+									"    var supportedDistanceUnits = [\"km\", \"ml\"];",
+									"    var distanceUnits = pm.response.json().data.distanceUnits;",
+									"    pm.expect(supportedDistanceUnits).to.contain(distanceUnits);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"currency\": \"eur\",\n  \"distanceUnits\": \"ml\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{dev_env}}users/settings",
+							"host": [
+								"{{dev_env}}users"
+							],
+							"path": [
+								"settings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "edit_password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set(\"user_password\", JSON.parse(pm.request.body.raw).password);",
+									"",
+									"var savedUserId = pm.collectionVariables.get(\"userId\");",
+									"var jsonData = pm.response.json();",
+									"var responseUserId = jsonData.data.userId;",
+									"",
+									"pm.test(\"userId is the same after password change\", function () {",
+									"    pm.expect(responseUserId).to.eql(savedUserId);",
+									"});",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"oldPassword\": \"{{user_password}}\",\n  \"password\": \"jsh^gF34pj788u\",\n  \"repeatPassword\": \"jsh^gF34pj788u\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{dev_env}}users/password",
+							"host": [
+								"{{dev_env}}users"
+							],
+							"path": [
+								"password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Body matches string\", function () {",
+									"    pm.expect(pm.response.text()).to.include(\"ok\");",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{dev_env}}auth/logout",
+							"host": [
+								"{{dev_env}}auth"
+							],
+							"path": [
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "signin_again",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set(\"user_password\", JSON.parse(pm.request.body.raw).password);",
+									"",
+									"var savedUserId = pm.collectionVariables.get(\"userId\");",
+									"var jsonData = pm.response.json();",
+									"var responseUserId = jsonData.data.userId;",
+									"",
+									"pm.test(\"userId is the same when signing in after logout\", function () {",
+									"    pm.expect(responseUserId).to.eql(savedUserId);",
+									"});",
+									"",
+									"pm.test(\"has keys data and status\", function () {   ",
+									"    pm.expect(jsonData).to.have.keys('status','data');",
+									"});",
+									"pm.test(\"status is ok\", function () {   ",
+									"    pm.expect(jsonData).to.have.property('status','ok')",
+									"});",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"{{user_email}}\",\n  \"password\": \"{{user_password}}\",\n  \"remember\": false\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{dev_env}}auth/signin",
+							"host": [
+								"{{dev_env}}auth"
+							],
+							"path": [
+								"signin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "car_brands",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Includes required fields\", function () {",
+									"    var data = pm.response.json().data;",
+									"",
+									"      data.forEach(function(key) {",
+									"        pm.expect(key).to.have.property(\"id\");",
+									"        pm.expect(key).to.have.property(\"title\");",
+									"        pm.expect(key).to.have.property(\"logoFilename\");",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Content-Type is present\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\");",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{dev_env}}cars/brands",
+							"host": [
+								"{{dev_env}}cars"
+							],
+							"path": [
+								"brands"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "car_models",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									" var jsonData = pm.response.json().data;",
+									"",
+									"pm.test(\"The response is not empty\", function () {",
+									"    pm.expect(jsonData).to.not.be.empty; ",
+									"});",
+									"",
+									"pm.test(\"Includes required fields\", function () {",
+									"      jsonData.forEach(function(key) {",
+									"        pm.expect(key).to.have.property(\"id\");",
+									"        pm.expect(key).to.have.property(\"carBrandId\");",
+									"        pm.expect(key).to.have.property(\"title\");",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{dev_env}}cars/models",
+							"host": [
+								"{{dev_env}}cars"
+							],
+							"path": [
+								"models"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add_car",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"pm.collectionVariables.set(\"car_id\", jsonData.data.id);",
+									"pm.collectionVariables.set(\"mileage\", jsonData.data.initialMileage);",
+									"",
+									"",
+									"var status = jsonData.status === \"ok\";",
+									"pm.test(\"Status is ok\", function () {   ",
+									"    pm.expect(status).to.be.true",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"carBrandId\": 2,\n  \"carModelId\": 8,\n  \"mileage\": 120\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{dev_env}}cars",
+							"host": [
+								"{{dev_env}}cars"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "users_cars",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Body matches string\", function () {",
+									"    pm.expect(pm.response.text()).to.include(\"data\");",
+									"});",
+									"pm.test(\"Content-Type is present\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\");",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{dev_env}}cars",
+							"host": [
+								"{{dev_env}}cars"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "current_car_by_id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"var savedCarId = pm.collectionVariables.get(\"car_id\");",
+									"var responseCarId = jsonData.data.id;",
+									"var savedMileage = pm.collectionVariables.get(\"mileage\");",
+									"var responseMileage = jsonData.data.initialMileage;",
+									"",
+									"pm.test(\"Car id and mileage are the same\", function () {",
+									"    pm.expect(responseCarId).to.eql(savedCarId);",
+									"    pm.expect(responseMileage).to.eql(savedMileage);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{dev_env}}cars/{{car_id}}",
+							"host": [
+								"{{dev_env}}cars"
+							],
+							"path": [
+								"{{car_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "edid_car",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var previousMileage = pm.collectionVariables.get(\"mileage\");",
+									"var newMileage = parseInt(previousMileage) + Math.floor(Math.random() * 100) + 1;",
+									"",
+									"pm.collectionVariables.set(\"mileage\", newMileage);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"'initialMileage' is less than edited 'mileage'\", function () {",
+									"    var jsonData = pm.response.json().data;",
+									"    pm.expect(jsonData.initialMileage).to.be.lt(jsonData.mileage);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"carBrandId\": 4,\n  \"carModelId\": 8,\n  \"mileage\": {{mileage}}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{dev_env}}cars/{{car_id}}",
+							"host": [
+								"{{dev_env}}cars"
+							],
+							"path": [
+								"{{car_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create_expenses",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"",
+									"var jsonData = pm.response.json();",
+									"pm.collectionVariables.set(\"expense_id\", jsonData.data.id);",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var moment = require('moment');",
+									"pm.collectionVariables.set('currentDate', moment().format((\"YYYY-MM-DD\")));",
+									"",
+									"var currentLiters = pm.variables.replaceIn(Math.floor(Math.random() * 100) + 1);",
+									"pm.collectionVariables.set(\"currentLiters\", currentLiters);",
+									"",
+									"var currentTotalCost = pm.variables.replaceIn(Math.floor(Math.random() * 100) + 1);",
+									"pm.collectionVariables.set(\"currentTotalCost\", currentTotalCost);",
+									"",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"carId\": \"{{car_id}}\",\n  \"reportedAt\": \"{{currentDate}}\",\n  \"mileage\": {{mileage}},\n  \"liters\": {{currentLiters}},\n  \"totalCost\": 50,\n  \"forceMileage\": false\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{dev_env}}expenses",
+							"host": [
+								"{{dev_env}}expenses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "edid_expences",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var previousMileage = pm.collectionVariables.get(\"mileage\");",
+									"var newMileage = parseInt(previousMileage) + Math.floor(Math.random() * 100) + 1;",
+									"pm.collectionVariables.set(\"mileage\", newMileage);",
+									"var currentLiters = pm.variables.replaceIn(Math.floor(Math.random() * 100) + 1);",
+									"pm.collectionVariables.set(\"newLiters\", currentLiters);",
+									"",
+									"var currentTotalCost = pm.variables.replaceIn(Math.floor(Math.random() * 100) + 1);",
+									"pm.collectionVariables.set(\"newTotalCost\", currentTotalCost);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var currentLiters = parseFloat(pm.variables.get(\"currentLiters\"));",
+									"var newLiters = parseFloat(pm.response.json().data.liters); ",
+									"pm.test(\"Check if current and new liters exist\", function () {",
+									"    pm.expect(currentLiters).to.exist; ",
+									"    pm.expect(newLiters).to.exist;",
+									"});",
+									"pm.test(\"Check if new liters amount is greater than previous liters amount\", function () {",
+									"    pm.expect(newLiters).to.be.at.least(currentLiters); ",
+									"});",
+									"",
+									"var currentTotalCost = parseFloat(pm.variables.get(\"currentTotalCost\"));",
+									"var newTotalCost = parseFloat(pm.response.json().data.totalCost); ",
+									"pm.test(\"Check if current and new total cost exist\", function () {",
+									"    pm.expect(currentTotalCost).to.exist; ",
+									"    pm.expect(newTotalCost).to.exist;",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"carId\": \"{{car_id}}\",\n  \"reportedAt\": \"{{currentDate}}\",\n  \"mileage\": {{mileage}},\n  \"liters\": {{currentLiters}},\n  \"totalCost\": 50,\n  \"forceMileage\": false\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{dev_env}}expenses/{{expense_id}}",
+							"host": [
+								"{{dev_env}}expenses"
+							],
+							"path": [
+								"{{expense_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete_car",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.unset(\"car_id\");",
+									"pm.collectionVariables.unset(\"currentDate\");",
+									"pm.collectionVariables.unset(\"expense_id\");",
+									"pm.collectionVariables.unset(\"mileage\");",
+									"pm.collectionVariables.unset(\"currentLiters\");",
+									"pm.collectionVariables.unset(\"currentTotalCost\");",
+									"pm.collectionVariables.unset(\"newLiters\");",
+									"pm.collectionVariables.unset(\"newTotalCost\");",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{dev_env}}cars/{{car_id}}",
+							"host": [
+								"{{dev_env}}cars"
+							],
+							"path": [
+								"{{car_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete_user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.unset(\"user_email\");",
+									"pm.collectionVariables.unset(\"user_lastName\");",
+									"pm.collectionVariables.unset(\"user_name\");",
+									"pm.collectionVariables.unset(\"user_password\");",
+									"pm.collectionVariables.unset(\"userId\");",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{dev_env}}users",
+							"host": [
+								"{{dev_env}}users"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "prod_env",
+			"value": "https://qauto.forstudy.space/api/",
+			"type": "string"
+		},
+		{
+			"key": "dev_env",
+			"value": "https://qauto2.forstudy.space/api/",
+			"type": "string"
+		}
+	]
+}
